@@ -13,7 +13,7 @@ async function fetchPancakeSwapPools() {
   const query = `
     {
       pools(
-        first: 50
+        first: 500
         where: {
           token0_: {derivedUSD_gt: "0"}
           token1_: {derivedUSD_gt: "0"}
@@ -66,7 +66,7 @@ async function fetchUniswapPools() {
   const query = `
     {
       pools(
-        first: 50
+        first: 500
         where: {
            token0_: {derivedETH_gt: "0"}
            token1_: {derivedETH_gt: "0"}

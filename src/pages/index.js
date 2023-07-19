@@ -42,20 +42,20 @@ export default function HomePage() {
   }, [buttonClicked]);
 
   const handleArbitrageButtonClick = async () => {
-    const pancakePools = await fetchPancakeSwapPools();
     setProgress(25); // Atualiza o progresso para 25%
 
-    const uniswapPools = await fetchUniswapPools();
+    const pancakePools = await fetchPancakeSwapPools();
     setProgress(50); // Atualiza o progresso para 50%
 
-    const results = analyzeArbitrageOpportunities(pancakePools, uniswapPools);
-    if (results.length > 0) {
-      setArbitrageResults(results);
-    } else {
-      setArbitrageMessage("Nenhuma oportunidade de arbitragem encontrada");
-    }
+    const uniswapPools = await fetchUniswapPools();
+    setProgress(75); // Atualiza o progresso para 75%
+
+    const results = await analyzeArbitrageOpportunities(); // Chama a função de análise
+    setArbitrageResults(results || []); // Armazena os resultados na variável de estado ou uma lista vazia se for null
     setProgress(100); // Atualiza o progresso para 100% ao final da execução
   };
+
+  const hasArbitrageResults = arbitrageResults?.length > 0;
 
   return (
     <div>
@@ -109,15 +109,32 @@ export default function HomePage() {
           ))}
         </div>
 
-        {Object.keys(arbitrageDetails).length > 0 && (
+        {buttonClicked && !arbitrageMessage && !hasArbitrageResults && (
+          <p>Não foram encontradas oportunidades de arbitragem.</p>
+        )}
+
+        {arbitrageMessage && (
           <div>
-            <h2>Detalhes da Oportunidade de Arbitragem:</h2>
-            <p>Pancake Pool: {arbitrageDetails.pancakePool}</p>
-            <p>Uniswap Pool: {arbitrageDetails.uniswapPool}</p>
-            <p>Profit: {arbitrageDetails.profit}</p>
-            <p>Gas Fee: {arbitrageDetails.gasFee}</p>
-            {/* Renderize outras informações relevantes */}
+            <p>{arbitrageMessage}</p>
+            {/* Exiba outras informações ou mensagens relevantes */}
           </div>
+        )}
+
+        {hasArbitrageResults && arbitrageResults.length > 0 ? (
+          <div>
+            <h2>Oportunidades de Arbitragem:</h2>
+            {arbitrageResults.map((result, index) => (
+              <div key={`arbitrage-result-${index}`}>
+                <p>Pancake Pool: {result.pancakePool}</p>
+                <p>Uniswap Pool: {result.uniswapPool}</p>
+                <p>Profit: {result.profit}</p>
+                <p>Gas Fee: {result.gasFee}</p>
+                {/* Renderize outras informações relevantes */}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p></p>
         )}
 
         <p className={styles.totalPools}>
@@ -130,6 +147,7 @@ export default function HomePage() {
         <button className={styles.button} onClick={handleArbitrageButtonClick}>
           Executar Análise de Arbitragem
         </button>
+
         <div style={{ display: "flex", alignItems: "center" }}>
           <LinearProgress
             variant="determinate"
@@ -142,13 +160,6 @@ export default function HomePage() {
           <span style={{ marginLeft: "10px" }}>{`${progress}%`}</span>
         </div>
       </div>
-
-      {arbitrageMessage && (
-        <div>
-          <p>{arbitrageMessage}</p>
-          {/* Exiba outras informações ou mensagens relevantes */}
-        </div>
-      )}
     </div>
   );
 }
