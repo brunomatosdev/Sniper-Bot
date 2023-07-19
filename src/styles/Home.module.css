@@ -117,3 +117,14 @@
   max-height: 300px; /* Ajuste a altura máxima conforme necessário */
   overflow: auto;
 }
+
+.custom-progress-bar {
+  height: 10px;
+  border-radius: 5px;
+  background-color: #a20f0f;
+}
+
+.custom-progress-bar .progress-bar {
+  border-radius: 5px;
+  background-color: #007bff;
+}
